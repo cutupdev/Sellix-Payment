@@ -1,0 +1,1 @@
+export const frontUrl = 'https://dev.portal-frontend.solanavibestation.com'

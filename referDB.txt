@@ -1,0 +1,130 @@
+class Users(Base):
+    __tablename__ = 'Users'
+    user_id = Column(Integer, primary_key=True)
+    username = Column(String(255), nullable=False, unique=True)  # Specify length for VARCHAR
+    email = Column(String(255), nullable=False, unique=True)     # Specify length for VARCHAR
+    password_hash = Column(String(255), nullable=False)          # Specify length for VARCHAR
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow)
+    invite_code = Column(String(255))                            # Specify length for VARCHAR
+    join_method = Column(String(255))                            # Specify length for VARCHAR
+    #reset_token = Column(String(255))                            # Specify length for VARCHAR
+
+    def to_dict(self):
+        return {
+            'username': self.username,
+            'email': self.email,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at,
+            'invite_code': self.invite_code,
+            'join_method': self.join_method
+        }
+
+class Subscriptions(Base):
+    __tablename__ = 'Subscriptions'
+    subscription_id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('Users.user_id'), nullable=False)
+    service_id = Column(Integer, ForeignKey('Services.service_id'), nullable=False)
+    start_date = Column(DateTime, nullable=False)
+    expire_date = Column(DateTime, nullable=False)
+    status = Column(String(255), nullable=False)  # Specify length for VARCHAR
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.datetime.utcnow)
+    custom_name = Column(String(255))             # Specify length for VARCHAR
+
+    def to_dict(self):
+        return {
+            'subscription_id': self.subscription_id,
+            'user_id': self.user_id,
+            'service_id': self.service_id,
+            'start_date': self.start_date,
+            'expire_date': self.expire_date,
+            'status': self.status,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at,
+            'custom_name': self.custom_name
+        }
+    
+class Payments(Base):
+    __tablename__ = 'Payments'
+    payment_id = Column(Integer, primary_key=True)
+    subscription_id = Column(Integer, ForeignKey('Subscriptions.subscription_id'), nullable=False)
+    user_id = Column(Integer, ForeignKey('Users.user_id'), nullable=False)
+    payment_amount = Column(Float, nullable=False)
+    payment_date = Column(DateTime, nullable=False)
+    payment_method = Column(String(255), nullable=False)  # Specify length for VARCHAR
+    transaction_id = Column(String(255), nullable=False)  # Specify length for VARCHAR
+
+    def to_dict(self):
+        return {
+            'payment_id': self.payment_id,
+            'subscription_id': self.subscription_id,
+            'user_id': self.user_id,
+            'payment_amount': self.payment_amount,
+            'payment_date': self.payment_date,
+            'payment_method': self.payment_method,
+            'transaction_id': self.transaction_id
+        }
+
+class Services(Base):
+    __tablename__ = 'Services'
+    service_id = Column(Integer, primary_key=True)
+    service_name = Column(String(255), nullable=False)  # Specify length for VARCHAR
+    tier_name = Column(String(255), nullable=False)     # Specify length for VARCHAR
+    description = Column(String(255))
+    connection_url = Column(String(255))
+    daily_price = Column(Float)
+    weekly_price = Column(Float)
+    monthly_price = Column(Float)
+
+    def to_dict(self):
+        return {
+            'service_id': self.service_id,
+            'service_name': self.service_name,
+            'tier_name': self.tier_name,
+            'description': self.description,
+            'connection_url': self.connection_url,
+            'daily_price': self.daily_price,
+            'weekly_price': self.weekly_price,
+            'monthly_price': self.monthly_price
+        }
+
+class APIKeys(Base):
+    __tablename__ = 'APIKeys'
+    id = Column(Integer, primary_key=True)
+    subscription_id = Column(Integer, ForeignKey('Subscriptions.subscription_id'), nullable=False)
+    api_key = Column(String(255), nullable=False, unique=True)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'subscription_id': self.subscription_id,
+            'api_key': self.api_key
+        }
+
+class IPWhitelist(Base):
+    __tablename__ = 'IPWhitelist'
+    id = Column(Integer, primary_key=True)
+    subscription_id = Column(Integer, ForeignKey('Subscriptions.subscription_id'), nullable=False)
+    ip = Column(String(255))
+
+    def to_dict(self):
+        return {
+            'service_id': self.id,
+            'subscription_id': self.subscription_id,
+            'ip': self.ip
+        }
+
+class Proxies(Base):
+    __tablename__ = 'Proxies'
+    proxy_id = Column(Integer, primary_key=True, autoincrement=True)
+    ip_address = Column(String(255), nullable=False)
+    service_id = Column(Integer, ForeignKey('Services.service_id'), nullable=False)
+
+    def to_dict(self):
+        return {
+            'proxy_id': self.proxy_id,
+            'service_id': self.service_id,
+            'ip_address': self.ip_address
+            
+        }
